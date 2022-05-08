@@ -11,61 +11,57 @@ const Wareki = {
 
 type WarekiKey = keyof typeof Wareki;
 
-const calcWareki = (searchYear: number) => {
+const calc = (targetYear: number) => {
   return Object.keys(Wareki).reduce(
     (prev, current) => {
       const { start, label } = Wareki[current as WarekiKey];
-      if (searchYear < start) return prev;
+      if (targetYear < start) return prev;
 
-      return [...prev, `${label}${searchYear - start + 1}年`];
+      return [...prev, `${label}${targetYear - start + 1}年`];
     },
-    [`西暦${searchYear}年`]
+    [`西暦${targetYear}年`]
   );
 };
 
-const warekiExtractRegex;
+// こんな感じの正規表現を生成する
+// ^(令和|令|R|平成|平|H|昭和|昭|S|大正|大|T|明治|明|M)(\d+)
+const warekiExtractRegex = () => {
+  const allPrefixes = Object.keys(Wareki).reduce<string[]>((prev, current) => {
+    const { prefixes } = Wareki[current as WarekiKey];
+    return [...prev, ...prefixes];
+  }, []);
 
-const convertYear = (searchYear: string) => {
-  const result = NaN;
-
-  // 西暦
-  if (Number(searchYear) > 0) {
-    return Number(searchYear);
-  }
-
-  // 和暦は 開始+year-1
-
-  return result;
+  return new RegExp(`^(${allPrefixes.join("|")})(\\d+)`);
 };
 
-// 数値は西暦
-//
-// 各年号は以下のように扱う
-// M,明治,明
-// T,大正,大
-// S,昭和,昭
-// H,平成,平
-// R,令和,令
-// 入力
-//    2019, 2019年
-//    H31, 平成31, 平31
-// 出力
-//    西暦2019年
-//    令和1年
-//    平成31年
-//    昭和97年
-//    大正111年
-//    明治155年
+const convertYear = (sourceYear: string) => {
+  // 西暦
+  if (Number(sourceYear) > 0) {
+    return Number(sourceYear);
+  }
+
+  // 和暦
+  const [_, sourceEraName, sourceEraYear] = sourceYear.match(warekiExtractRegex()) ?? [];
+  for (const [_, { start, prefixes }] of Object.entries(Wareki)) {
+    if (prefixes.findIndex((a) => a === sourceEraName) >= 0) {
+      // 各年号の開始年+各年号の年数-1
+      return start + Number(sourceEraYear) - 1;
+    }
+  }
+
+  return NaN;
+};
+
 export default function Command() {
   const [searchYear, setSearchYear] = React.useState("");
 
   const year = convertYear(searchYear);
-  const items = isNaN(year) ? [] : calcWareki(year);
+  const items = isNaN(year) ? [] : calc(year);
 
   return (
     <List
       isLoading={items.length === 0}
-      searchBarPlaceholder="Enter year of AD or 和暦"
+      searchBarPlaceholder="Enter year of 西暦 or 和暦"
       enableFiltering={false}
       onSearchTextChange={setSearchYear}
     >
@@ -85,7 +81,7 @@ export default function Command() {
 
 function Actions({ item }: { item: string }) {
   return (
-    <ActionPanel title="Wareki - 和暦">
+    <ActionPanel title="Wareki - 和暦西暦変換">
       <Action.CopyToClipboard content={item} title="Copy" />
     </ActionPanel>
   );
