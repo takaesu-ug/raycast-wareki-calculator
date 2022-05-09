@@ -3,7 +3,7 @@
   "name": "wareki-calculator",
   "title": "wareki-calculator",
   "description": "Wareki and AD conversion calculator",
-  "icon": "command-icon.png",
+  "icon": "wareki-icon.png",
   "author": "yusabana",
   "categories": [
     "Applications"
@@ -12,7 +12,7 @@
   "commands": [
     {
       "name": "index",
-      "title": "Wareki Calc",
+      "title": "Wareki Calculator - 和暦計算",
       "description": "wareki and AD conversion calculator",
       "mode": "view"
     }
