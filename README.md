@@ -10,9 +10,9 @@
   - H,平成,平
   - R,令和,令
 
-## Examples
+### Examples
 
-
+![raycast_wareki_sample.png](./raycast_wareki_sample.png)
 
 ```
 入力
@@ -25,3 +25,14 @@
    大正108年
    明治152年
 ```
+
+### Install
+
+clone this repository.
+
+```
+npm install
+npm run dev
+```
+
+And cancel devtools using Ctrl+C, then available Wareki Calculator.
