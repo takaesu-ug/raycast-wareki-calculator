@@ -19,7 +19,7 @@ const calc = (targetYear: number) => {
 
       return [...prev, `${label}${targetYear - start + 1}年`];
     },
-    [`西暦${targetYear}年`]
+    [`西暦${targetYear}年`],
   );
 };
 
@@ -41,8 +41,8 @@ const convertYear = (sourceYear: string) => {
   }
 
   // 和暦
-  const [_, sourceEraName, sourceEraYear] = sourceYear.match(warekiExtractRegex()) ?? [];
-  for (const [_, { start, prefixes }] of Object.entries(Wareki)) {
+  const [, sourceEraName, sourceEraYear] = sourceYear.match(warekiExtractRegex()) ?? [];
+  for (const { start, prefixes } of Object.values(Wareki)) {
     if (prefixes.findIndex((a) => a === sourceEraName) >= 0) {
       // 各年号の開始年+各年号の年数-1
       return start + Number(sourceEraYear) - 1;
@@ -60,9 +60,9 @@ export default function Command() {
 
   return (
     <List
-      isLoading={items.length === 0}
+      isLoading={false}
       searchBarPlaceholder="Enter year of 西暦 or 和暦"
-      enableFiltering={false}
+      filtering={false}
       onSearchTextChange={setSearchYear}
     >
       {items.map((item) => {
